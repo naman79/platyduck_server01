@@ -34,7 +34,6 @@ public class FileController {
     public String fileUpload(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
 
         System.out.println("FileController");
-        
 
         redirectAttributes.addFlashAttribute("message",
                 "You successfully uploaded " + file.getOriginalFilename() + "!");
