@@ -10,8 +10,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Controller
 @RequestMapping("/file")
@@ -30,8 +34,18 @@ public class FileController {
 
     @GetMapping("/fileUpload")
     public String uploadForm(Model model) {
+        File dirFile = new File(uploadPath);
+        File[] fileList = dirFile.listFiles();
+        Arrays.sort(fileList);
+        List<String> ret = new ArrayList<>();
 
-        System.out.println("FileController");
+        for (File file : fileList) {
+            if (file.isFile()) {
+                ret.add(file.getName());
+            }
+        }
+
+        model.addAttribute("files", ret);
 
         return "uploadForm.html";
     }
