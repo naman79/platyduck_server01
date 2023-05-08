@@ -36,14 +36,27 @@ public class FileController {
     public String uploadForm(Model model) {
         File dirFile = new File(uploadPath);
         File[] fileList = dirFile.listFiles();
-        Arrays.sort(fileList);
         List<String> ret = new ArrayList<>();
 
-        for (File file : fileList) {
-            if (file.isFile()) {
-                ret.add(file.getName());
-            }
+        if(fileList == null) {
+            return "uploadForm.html";
         }
+        
+        Arrays.sort(fileList);
+        Arrays.stream(fileList).sorted().filter(File::isFile).forEach( file -> {
+            ret.add(file.getName());
+        });
+
+//        for (File file : fileList) {
+//
+//            if(file.isFile()) {
+//
+//            }
+//
+//            if (file.isFile()) {
+//                ret.add(file.getName());
+//            }
+//        }
 
         model.addAttribute("files", ret);
 
