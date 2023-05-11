@@ -15,13 +15,13 @@
                 processData: false,
                 contentType: false,
                 cache: false,
-                success: function () {
-                    // Handle upload success
-                    // ...
+                success: function (e) {
+                    console.info("success");
+                    console.info(e);
                 },
-                error: function () {
-                    // Handle upload error
-                    // ...
+                error: function (e) {
+                    console.info("error");
+                    console.info(e);
                 }
             });
         }
