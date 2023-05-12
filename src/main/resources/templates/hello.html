@@ -2,8 +2,30 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <script src="/js/jquery-ui/external/jquery/jquery.js"></script>
+    <script src="/js/jquery-ui/jquery-ui.js"></script>
+    <script>
+        function callApi() {
+            $.ajax({
+                url: "/call-api",
+                type: "POST",
+                data: JSON.stringify({"data1":"one"}),
+                contentType: "application/json",
+                cache: false,
+                success: function (e) {
+                    console.info("success");
+                    console.info(e);
+                },
+                error: function (e) {
+                    console.info("error");
+                    console.info(e);
+                }
+            });
+        }
+    </script>
 </head>
 <body>
 hello
+<button onclick="callApi()">call-api</button>
 </body>
 </html>
