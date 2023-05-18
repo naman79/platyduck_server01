@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/file")
@@ -77,7 +78,7 @@ public class FileController {
         List<String> ret = new ArrayList<>();
 
         if(fileList == null) {
-            return "uploadForm.html";
+            return "uploadAjax.html";
         }
 
         Arrays.sort(fileList);
@@ -99,6 +100,12 @@ public class FileController {
         model.addAttribute("files", ret);
 
         return "uploadAjax.html";
+    }
+
+    @GetMapping("/upload-filejson")
+    public String uploadFileAndJson(Model model) {
+
+        return "uploadFileJson.html";
     }
 
     @RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
@@ -126,5 +133,31 @@ public class FileController {
 
         return new ResponseEntity<>(HttpStatus.OK);
     } // method uploadFile
+
+    @RequestMapping(value = "/uploadFileJson", method = RequestMethod.POST)
+    public ResponseEntity<?> uploadFileJson(
+            @RequestPart(value = "key") Map<String, Object>  requestMap,
+            @RequestPart(value = "file") MultipartFile uploadfile) {
+
+        try {
+            // Get the filename and build the local file path (be sure that the
+            // application have write permissions on such directory)
+            String filename = uploadfile.getOriginalFilename();
+            String directory = uploadPath;
+            String filepath = Paths.get(directory, filename).toString();
+
+            // Save the file locally
+            BufferedOutputStream stream =
+                    new BufferedOutputStream(new FileOutputStream(new File(filepath)));
+            stream.write(uploadfile.getBytes());
+            stream.close();
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
 }
