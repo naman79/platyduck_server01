@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>uplaod-ajax</title>
+    <script src="/js/jquery-ui/external/jquery/jquery.js"></script>
+    <script src="/js/jquery-ui/jquery-ui.js"></script>
+    <script>
+        function uploadFile() {
+            $.ajax({
+                url: "/file/uploadFile",
+                type: "POST",
+                data: new FormData($("#upload-file-form")[0]),
+                enctype: 'multipart/form-data',
+                processData: false,
+                contentType: false,
+                cache: false,
+                success: function (e) {
+                    console.info("success");
+                    console.info(e);
+                },
+                error: function (e) {
+                    console.info("error");
+                    console.info(e);
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+<form id="upload-file-form">
+    <input type="text" name="extra">
+    <label for="upload-file-input">Upload your file:</label>
+    <input id="upload-file-input" type="file" name="uploadfile" accept="*" />
+    <button type="button" onclick="uploadFile();">업로드</button>
+</form>
+</body>
+</html>

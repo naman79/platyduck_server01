@@ -160,4 +160,36 @@ public class FileController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+
+    @GetMapping("/upload-tcp")
+    public String uploadTcp(Model model) {
+        File dirFile = new File(uploadPath);
+        File[] fileList = dirFile.listFiles();
+        List<String> ret = new ArrayList<>();
+
+        if(fileList == null) {
+            return "uploadTcp.html";
+        }
+
+        Arrays.sort(fileList);
+        Arrays.stream(fileList).sorted().filter(File::isFile).forEach( file -> {
+            ret.add(file.getName());
+        });
+
+//        for (File file : fileList) {
+//
+//            if(file.isFile()) {
+//
+//            }
+//
+//            if (file.isFile()) {
+//                ret.add(file.getName());
+//            }
+//        }
+
+        model.addAttribute("files", ret);
+
+        return "uploadTcp.html";
+    }
+
 }
