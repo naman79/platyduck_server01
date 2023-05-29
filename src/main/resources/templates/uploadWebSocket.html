@@ -14,7 +14,7 @@
             formData.append("key", new Blob([JSON.stringify(data)], {type: "application/json"}));
 
             $.ajax({
-                url: "/file/uploadFileJson",
+                url: "/file/upload-websocket",
                 type: "POST",
                 data: formData,
                 processData: false,

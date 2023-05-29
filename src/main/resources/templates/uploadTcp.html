@@ -7,11 +7,16 @@
     <script src="/js/jquery-ui/jquery-ui.js"></script>
     <script>
         function uploadFile() {
+
+            var data = {'data1':'001', 'data2':'002'};
+            var formData = new FormData($("#upload-file-form")[0]);
+            formData.append("file", $("#upload-file-input")[0].files[0]);
+            formData.append("key", new Blob([JSON.stringify(data)], {type: "application/json"}));
+
             $.ajax({
-                url: "/file/uploadFile",
+                url: "/file/upload-tcp",
                 type: "POST",
-                data: new FormData($("#upload-file-form")[0]),
-                enctype: 'multipart/form-data',
+                data: formData,
                 processData: false,
                 contentType: false,
                 cache: false,

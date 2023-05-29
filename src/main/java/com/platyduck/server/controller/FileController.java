@@ -10,10 +10,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.swing.*;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.net.Socket;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -139,25 +137,7 @@ public class FileController {
             @RequestPart(value = "key") Map<String, Object>  requestMap,
             @RequestPart(value = "file") MultipartFile uploadfile) {
 
-        try {
-            // Get the filename and build the local file path (be sure that the
-            // application have write permissions on such directory)
-            String filename = uploadfile.getOriginalFilename();
-            String directory = uploadPath;
-            String filepath = Paths.get(directory, filename).toString();
-
-            // Save the file locally
-            BufferedOutputStream stream =
-                    new BufferedOutputStream(new FileOutputStream(new File(filepath)));
-            stream.write(uploadfile.getBytes());
-            stream.close();
-        }
-        catch (Exception e) {
-            System.out.println(e.getMessage());
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        return new ResponseEntity<>(HttpStatus.OK);
+            return getMultipartData(requestMap, uploadfile);
     }
 
 
@@ -190,6 +170,99 @@ public class FileController {
         model.addAttribute("files", ret);
 
         return "uploadTcp.html";
+    }
+
+    @PostMapping("/upload-tcp")
+    public ResponseEntity<?> uploadTcp(
+            @RequestPart(value = "key") Map<String, Object>  requestMap,
+            @RequestPart(value = "file") MultipartFile uploadfile
+    ) {
+
+        String serverHost = "localhost"; // Replace with the server's host address
+        int serverPort = 7171; // Replace with the server's port
+
+        try (Socket socket = new Socket(serverHost, serverPort);
+             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+             PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) {
+
+            System.out.println("Connected to TCP server at " + serverHost + ":" + serverPort);
+
+            String message = "Hello, server!";
+            writer.println(message);
+            System.out.println("Sent message to server: " + message);
+
+            String response = reader.readLine();
+            System.out.println("Received response from server: " + response);
+
+        } catch (IOException e) {
+            System.err.println("Error connecting to TCP server: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return getMultipartData(requestMap, uploadfile);
+    }
+
+    @GetMapping("/upload-websocket")
+    public String uploadWebSocket(Model model) {
+        File dirFile = new File(uploadPath);
+        File[] fileList = dirFile.listFiles();
+        List<String> ret = new ArrayList<>();
+
+        if(fileList == null) {
+            return "uploadTcp.html";
+        }
+
+        Arrays.sort(fileList);
+        Arrays.stream(fileList).sorted().filter(File::isFile).forEach( file -> {
+            ret.add(file.getName());
+        });
+
+//        for (File file : fileList) {
+//
+//            if(file.isFile()) {
+//
+//            }
+//
+//            if (file.isFile()) {
+//                ret.add(file.getName());
+//            }
+//        }
+
+        model.addAttribute("files", ret);
+
+        return "uploadWebSocket.html";
+    }
+
+    @PostMapping("/upload-websocket")
+    public ResponseEntity<?> uploadWebSocket(
+            @RequestPart(value = "key") Map<String, Object>  requestMap,
+            @RequestPart(value = "file") MultipartFile uploadfile
+    ) throws IOException {
+
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> getMultipartData(Map<String, Object> requestMap, MultipartFile uploadfile) {
+        try {
+            // Get the filename and build the local file path (be sure that the
+            // application have write permissions on such directory)
+            String filename = uploadfile.getOriginalFilename();
+            String directory = uploadPath;
+            String filepath = Paths.get(directory, filename).toString();
+
+            // Save the file locally
+            BufferedOutputStream stream =
+                    new BufferedOutputStream(new FileOutputStream(new File(filepath)));
+            stream.write(uploadfile.getBytes());
+            stream.close();
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
